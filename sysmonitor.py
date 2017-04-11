@@ -77,7 +77,7 @@ class SystemMonitor():
 		self.batt_estimate.set("Battery Estimate: "+str(self.battery_estimate))
 		self.batt_estimate_label = Label(self.sensor_frame2, textvariable = self.batt_estimate )
 		self.batt_estimate_label.pack()
-		self.label_batt_type = Label(self.sensor_frame2, text = "Power Source:"+self.power_source )
+		self.label_batt_type = Label(self.sensor_frame2, text = "Power Source: "+self.power_source )
 		self.label_batt_type.pack(side = LEFT)
 
 
@@ -117,8 +117,8 @@ class SystemMonitor():
 			if current==0:
 				self.battery_estimate = "Charging"
 			else:
-				hours = int((charge/current/3600))
-				mins = int(((charge/current)%3600)/60)
+				hours = int((charge/current))
+				mins = int(((charge/current)-hours)*60)
 				self.battery_estimate = str(hours)+" hrs "+str(mins)+" mins"
 			self.batt_estimate.set("Battery Estimate: "+str(self.battery_estimate))
 		except Exception as e:
