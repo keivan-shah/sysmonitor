@@ -30,7 +30,7 @@ class SystemMonitor():
 		self.n.add(self.f4, text='Graph')
 		self.n.pack()
 
-					######################### CPU USAGE ############################
+############################################### CPU USAGE ###################################################
 		#Current CPU usage
 		self.cur_cpu = pc.cpu_percent()
 		self.cpu_arr = deque()
@@ -42,13 +42,26 @@ class SystemMonitor():
 
 		#Variable string to store current CPU usage 
 		self.cpu_percent = StringVar()
-		self.cpu_percent.set(str(self.cur_cpu)+" %")
-		self.label_perc = Label(self.f1, text = "CPU Usage: " )
-		self.label_perc.pack()
-		self.per = Label(self.f1, textvariable = self.cpu_percent )
-		self.per.pack()
+		self.cpu_percent.set("CPU Usage: "+str(self.cur_cpu)+" %")
+		self.cpu_percent_label = Label(self.f1, textvariable = self.cpu_percent )
+		self.cpu_percent_label.pack()
 
-					#########################  MEMORY  ###########################
+		self.cpu_freq = pc.cpu_freq()
+		self.cpu_freq_val = StringVar()
+		self.cpu_freq_val.set(str("Current CPU Freq: "+str(int(self.cpu_freq[0]))+" MHz"))
+		self.cpu_freq_label = Label(self.f1, textvariable = self.cpu_freq_val )
+		self.cpu_freq_label.pack()
+
+		self.cpu_count_label = Label(self.f1, text = "Number of CPUs: "+str(pc.cpu_count()) )
+		self.cpu_count_label.pack()
+
+		self.pid = pc.pids()
+		self.pid_val = StringVar()
+		self.pid_val.set(str("Total Running Processes: "+str(len(self.pid))))
+		self.pid_label = Label(self.f1, textvariable = self.pid_val )
+		self.pid_label.pack()
+
+##################################################  MEMORY  ###################################################
 		self.ram = pc.virtual_memory()
 		self.swap = pc.swap_memory()
 		self.disk = pc.disk_usage('/home')
@@ -64,6 +77,7 @@ class SystemMonitor():
 		self.memory_window.add(self.memory_frame2)
 		self.memory_window.add(self.memory_frame3)	
 
+		# RAM Used
 		self.ram_bar = Progressbar(self.memory_frame1, length=300, value = self.ram_percent, mode="determinate")
 		self.ram_bar.pack(padx=5, pady=5)
 		self.ram_val = StringVar()
@@ -71,6 +85,7 @@ class SystemMonitor():
 		self.ram_label = Label(self.memory_frame1, textvariable = self.ram_val)
 		self.ram_label.pack(side = LEFT)
 
+		#Swap Used
 		self.swap_bar = Progressbar(self.memory_frame2, length=300, value = self.swap_percent, mode="determinate")
 		self.swap_bar.pack(padx=5, pady=5)
 		self.swap_val = StringVar()
@@ -78,6 +93,7 @@ class SystemMonitor():
 		self.swap_label = Label(self.memory_frame2, textvariable = self.swap_val)
 		self.swap_label.pack(side = LEFT)
 
+		#Disk Space Used
 		self.disk_bar = Progressbar(self.memory_frame3, length=300, value = self.disk_percent, mode="determinate")
 		self.disk_bar.pack(padx=5, pady=5)
 		self.disk_val = StringVar()
@@ -90,8 +106,7 @@ class SystemMonitor():
 		self.memory_frame3.pack()
 		self.memory_window.pack()	
 
-
-					######################### SENSORS ############################
+#################################################### SENSORS ##############################################
 		#Current Sensor Values
 		self.temperature = pc.sensors_temperatures()
 		self.battery = pc.sensors_battery()
@@ -121,6 +136,7 @@ class SystemMonitor():
 		self.temp_bar = Progressbar(self.sensor_frame1, length=300, value = self.temp_cur, mode="determinate", maximum = self.temp_critical)
 		self.temp_bar.pack(padx=5, pady=5)
 
+		#Temperature
 		self.cur_temp = StringVar()
 		self.cur_temp.set("cur_temp: "+str(self.temp_cur)+"`C")
 		self.cur_temp_label = Label(self.sensor_frame1, textvariable = self.cur_temp )
@@ -140,25 +156,30 @@ class SystemMonitor():
 		self.sensor_frame2.pack(side = LEFT)
 		self.sensor_window.pack()
 
-					######################### GRAPH ############################
-		self.fig = Figure()
+################################################### GRAPH ###############################################
+		#Graph Variables
+		self.fig = Figure(figsize=(0.1,0.1))
 		ax = self.fig.add_subplot(111)
-		self.line, = ax.plot(range(100))
-		ax.axis([0,100,0,100])
+		self.line, = ax.plot(range(50))
+		ax.axis([0,50,0,100])
+		ax.set_title ("CPU Usage", fontsize=12)
+		ax.set_ylabel("Percentage", fontsize=10)
+		ax.set_xlabel("Time", fontsize=10)
 		self.canvas = FigureCanvasTkAgg(self.fig, master=self.f4)
 		self.canvas.show()
-		self.canvas.get_tk_widget().pack(side='top', fill='both', expand=1)
+		self.canvas.get_tk_widget().pack(side='top', fill='both', expand=1,ipadx=180)
 
 
-					######################### UPDATE ############################		
+################################################### UPDATE ####################################################		
 
-		#Call Update() after 500ms
-		self.job1 = self.f1.after(500, self.update_cpu)
-		self.job2 = self.f2.after(1000,self.update_memory)
+		#Call Update() after 100 ms
+		self.job1 = self.f1.after(100, self.update_cpu)
+		self.job2 = self.f2.after(100,self.update_memory)
 		self.job3 = self.f3.after(100,self.update_sensors)
 		self.job4 = self.f4.after(100,self.update_graph)
 		#The Main Loop
 		self.root.mainloop()
+		#Kill everything once the window is closed.
 		print ("Killing everything")
 		self.f1.after_cancel(self.job1)
 		self.f2.after_cancel(self.job2)
@@ -170,10 +191,17 @@ class SystemMonitor():
 	def update_cpu(self):
 		self.cur_cpu = pc.cpu_percent()
 		self.cpu_arr.append(self.cur_cpu)
-		if(len(self.cpu_arr)>100):
+		if(len(self.cpu_arr)>50):
 			self.cpu_arr.popleft()
-		self.cpu_percent.set(str(self.cur_cpu)+" %")#UPDATE CPU PERCENTAGE VARIABLE
+		self.cpu_percent.set("CPU Usage: "+str(self.cur_cpu)+" %")#UPDATE CPU PERCENTAGE VARIABLE
 		self.cpu_bar["value"] = self.cur_cpu
+
+		self.cpu_freq = pc.cpu_freq()
+		self.cpu_freq_val.set(str("Current CPU Freq: "+str(int(self.cpu_freq[0]))+" MHz"))
+
+		self.pid = pc.pids()
+		self.pid_val.set(str("Total Running Processes: "+str(len(self.pid))))
+
 		self.job1 = self.f1.after(500, self.update_cpu)
 
 	#The Update function to update the Memory Values
@@ -214,15 +242,15 @@ class SystemMonitor():
 			self.batt_estimate.set("Battery Estimate: "+str(self.battery_estimate))
 		except Exception as e:
 			print (e)
-		self.job3 = self.f3.after(3000,self.update_sensors)
+		self.job3 = self.f3.after(2000,self.update_sensors)
 
+	#The Update function to update the Graph
 	def update_graph(self):
 		x, y = self.line.get_data()
 		self.line.set_ydata(np.array(self.cpu_arr))
 		self.line.set_xdata(np.arange(0,len(self.cpu_arr),1))
 		self.canvas.draw()
 		self.job4 = self.f4.after(500, self.update_graph)
-		
 
 
 test = SystemMonitor()
