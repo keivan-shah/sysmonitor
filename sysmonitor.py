@@ -141,9 +141,13 @@ class SystemMonitor():
 		self.sensor_window.pack()
 
 					######################### GRAPH ############################
-		self.fig = plt.figure()
+		self.fig = Figure()
+		ax = self.fig.add_subplot(111)
+		self.line, = ax.plot(range(100))
+		ax.axis([0,100,0,100])
 		self.canvas = FigureCanvasTkAgg(self.fig, master=self.f4)
-		self.canvas.get_tk_widget().pack()
+		self.canvas.show()
+		self.canvas.get_tk_widget().pack(side='top', fill='both', expand=1)
 
 
 					######################### UPDATE ############################		
@@ -170,8 +174,6 @@ class SystemMonitor():
 			self.cpu_arr.popleft()
 		self.cpu_percent.set(str(self.cur_cpu)+" %")#UPDATE CPU PERCENTAGE VARIABLE
 		self.cpu_bar["value"] = self.cur_cpu
-		# print(self.cur_cpu)
-		# print(self.cpu_arr)
 		self.job1 = self.f1.after(500, self.update_cpu)
 
 	#The Update function to update the Memory Values
@@ -215,17 +217,12 @@ class SystemMonitor():
 		self.job3 = self.f3.after(3000,self.update_sensors)
 
 	def update_graph(self):
-		v = np.array(self.cpu_arr)
-		x = np.arange(0,len(v),1)
-		# print (len(x),len(v))
-		plot(x,v)
+		x, y = self.line.get_data()
+		self.line.set_ydata(np.array(self.cpu_arr))
+		self.line.set_xdata(np.arange(0,len(self.cpu_arr),1))
+		self.canvas.draw()
 		self.job4 = self.f4.after(500, self.update_graph)
-
-def plot(x, y):
-	plt.clf()
-	plt.plot(x,y)
-	plt.axis([0,100,0,100])
-	plt.gcf().canvas.draw()
+		
 
 
 test = SystemMonitor()
