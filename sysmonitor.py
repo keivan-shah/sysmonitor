@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import psutil as pc
 from tkinter import *
 from tkinter.ttk import *
@@ -14,6 +16,7 @@ battery_directory = "/sys/class/power_supply/BAT1/"
 
 class SystemMonitor():
 	def __init__(self):
+		print("Starting System Monitor")
 		self.root = Tk()
 		self.root.title('System Monitor')
 		# self.root.geometry("600x300+150+150")
@@ -180,11 +183,12 @@ class SystemMonitor():
 		#The Main Loop
 		self.root.mainloop()
 		#Kill everything once the window is closed.
-		print ("Killing everything")
+		print ("Killing everything.")
 		self.f1.after_cancel(self.job1)
 		self.f2.after_cancel(self.job2)
 		self.f3.after_cancel(self.job3)
 		self.f4.after_cancel(self.job4)
+		print ("Good Bye!")
 		sys.exit()
 
 	#The Update function to update the CPU Usage Values
