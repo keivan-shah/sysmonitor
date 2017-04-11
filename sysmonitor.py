@@ -55,10 +55,24 @@ class SystemMonitor():
 
 		self.ram_bar = Progressbar(self.memory_frame1, length=300, value = self.ram_percent, mode="determinate")
 		self.ram_bar.pack(padx=5, pady=5)
+		self.ram_val = StringVar()
+		self.ram_val.set("Ram Used: "+str(self.ram_percent)+"%")
+		self.ram_label = Label(self.memory_frame1, textvariable = self.ram_val)
+		self.ram_label.pack(side = LEFT)
+
 		self.swap_bar = Progressbar(self.memory_frame2, length=300, value = self.swap_percent, mode="determinate")
 		self.swap_bar.pack(padx=5, pady=5)
+		self.swap_val = StringVar()
+		self.swap_val.set("Swap Used: "+str(self.swap_percent)+"%")
+		self.swap_label = Label(self.memory_frame2, textvariable = self.swap_val)
+		self.swap_label.pack(side = LEFT)
+
 		self.disk_bar = Progressbar(self.memory_frame3, length=300, value = self.disk_percent, mode="determinate")
 		self.disk_bar.pack(padx=5, pady=5)
+		self.disk_val = StringVar()
+		self.disk_val.set("Disk Used: "+str(self.disk_percent)+"%")
+		self.disk_label = Label(self.memory_frame3, textvariable = self.disk_val)
+		self.disk_label.pack(side = LEFT)
 
 		self.memory_frame1.pack()
 		self.memory_frame2.pack()
@@ -132,6 +146,20 @@ class SystemMonitor():
 		# print(self.cur_cpu)
 		self.f1.after(500, self.update_cpu)
 
+	#The Update function to update the Memory Values
+	def update_memory(self):
+		self.ram = pc.virtual_memory()
+		self.swap = pc.swap_memory()
+		self.disk = pc.disk_usage('/')
+		self.ram_percent = self.ram[2]
+		self.swap_percent = self.swap[3]
+		self.disk_percent = self.disk[3]
+		self.ram_val.set("Ram Used: "+str(self.ram_percent)+"%")
+		self.swap_val.set("Swap Used: "+str(self.swap_percent)+"%")
+		self.disk_val.set("Disk Used: "+str(self.disk_percent)+"%")
+		self.f2.after(1000,self.update_memory)
+
+	#The Update function to update the Sensor Values
 	def update_sensors(self):
 		self.temperature = pc.sensors_temperatures()
 		self.battery = pc.sensors_battery()
@@ -156,17 +184,7 @@ class SystemMonitor():
 			self.batt_estimate.set("Battery Estimate: "+str(self.battery_estimate))
 		except Exception as e:
 			print (e)
-		self.f3.after(5000,self.update_sensors)
-
-	def update_memory(self):
-		self.ram = pc.virtual_memory()
-		self.swap = pc.swap_memory()
-		self.disk = pc.disk_usage('/')
-		self.ram_percent = self.ram[2]
-		self.swap_percent = self.swap[3]
-		self.disk_percent = self.disk[3]
-
-		self.f2.after(1000,self.update_memory)
+		self.f3.after(3000,self.update_sensors)
 
 
 test = SystemMonitor()
