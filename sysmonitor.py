@@ -51,7 +51,7 @@ class SystemMonitor():
 
 		self.cpu_freq = pc.cpu_freq()
 		self.cpu_freq_val = StringVar()
-		self.cpu_freq_val.set(str("Current CPU Freq: "+str(int(self.cpu_freq[0]))+" MHz"))
+		self.cpu_freq_val.set(str("Current CPU Freq: "+str(int(self.cpu_freq[0]))+"/"+str(int(self.cpu_freq[2]))+" MHz"))
 		self.cpu_freq_label = Label(self.f1, textvariable = self.cpu_freq_val )
 		self.cpu_freq_label.pack()
 
@@ -201,7 +201,7 @@ class SystemMonitor():
 		self.cpu_bar["value"] = self.cur_cpu
 
 		self.cpu_freq = pc.cpu_freq()
-		self.cpu_freq_val.set(str("Current CPU Freq: "+str(int(self.cpu_freq[0]))+" MHz"))
+		self.cpu_freq_val.set(str("Current CPU Freq: "+str(int(self.cpu_freq[0]))+"/"+str(int(self.cpu_freq[2]))+" MHz"))
 
 		self.pid = pc.pids()
 		self.pid_val.set(str("Total Running Processes: "+str(len(self.pid))))
