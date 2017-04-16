@@ -11,6 +11,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from collections import deque
+from operator import itemgetter
 
 battery_directory = "/sys/class/power_supply/BAT1/"
 
@@ -19,6 +20,7 @@ class SystemMonitor():
 		print("Starting System Monitor")
 		self.root = Tk()
 		self.root.title('System Monitor')
+		self.root.iconbitmap('@sysmonitor.xbm')
 		# self.root.geometry("600x300+150+150")
 		
 		#NoteBook
@@ -27,13 +29,15 @@ class SystemMonitor():
 		self.f2 = Frame(self.n)   # Memory
 		self.f3 = Frame(self.n)   # Sensors
 		self.f4 = Frame(self.n)   # Graph
+		self.f5 = Frame(self.n)	  # Processes
 		self.n.add(self.f1, text='CPU Usage')
 		self.n.add(self.f2, text='Memory')
 		self.n.add(self.f3, text='CPU Temperature')
 		self.n.add(self.f4, text='Graph')
-		self.n.pack()
+		self.n.add(self.f5, text='Processes')
+		self.n.pack(fill=BOTH)
 
-############################################### CPU USAGE ###################################################
+################################################### CPU USAGE ######################################################
 		#Current CPU usage
 		self.cur_cpu = pc.cpu_percent()
 		self.cpu_arr = deque()
@@ -41,30 +45,30 @@ class SystemMonitor():
 
 		#Progress Bar to show current CPU usage
 		self.cpu_bar = Progressbar(self.f1, length=300, value = self.cur_cpu, mode="determinate")
-		self.cpu_bar.pack(padx=5, pady=5)
+		self.cpu_bar.pack(padx=5, pady=5,fill=BOTH)
 
 		#Variable string to store current CPU usage 
 		self.cpu_percent = StringVar()
 		self.cpu_percent.set("CPU Usage: "+str(self.cur_cpu)+" %")
 		self.cpu_percent_label = Label(self.f1, textvariable = self.cpu_percent )
-		self.cpu_percent_label.pack()
+		self.cpu_percent_label.place(relx=0.5, rely=0.2, anchor=CENTER)
 
 		self.cpu_freq = pc.cpu_freq()
 		self.cpu_freq_val = StringVar()
 		self.cpu_freq_val.set(str("Current CPU Freq: "+str(int(self.cpu_freq[0]))+"/"+str(int(self.cpu_freq[2]))+" MHz"))
 		self.cpu_freq_label = Label(self.f1, textvariable = self.cpu_freq_val )
-		self.cpu_freq_label.pack()
+		self.cpu_freq_label.place(relx=0.5, rely=0.3, anchor=CENTER)
 
 		self.cpu_count_label = Label(self.f1, text = "Number of CPUs: "+str(pc.cpu_count()) )
-		self.cpu_count_label.pack()
+		self.cpu_count_label.place(relx=0.5, rely=0.4, anchor=CENTER)
 
 		self.pid = pc.pids()
 		self.pid_val = StringVar()
 		self.pid_val.set(str("Total Running Processes: "+str(len(self.pid))))
 		self.pid_label = Label(self.f1, textvariable = self.pid_val )
-		self.pid_label.pack()
+		self.pid_label.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-##################################################  MEMORY  ###################################################
+######################################################  MEMORY  ####################################################
 		self.ram = pc.virtual_memory()
 		self.swap = pc.swap_memory()
 		self.disk = pc.disk_usage('/home')
@@ -82,34 +86,34 @@ class SystemMonitor():
 
 		# RAM Used
 		self.ram_bar = Progressbar(self.memory_frame1, length=300, value = self.ram_percent, mode="determinate")
-		self.ram_bar.pack(padx=5, pady=5)
+		self.ram_bar.pack(padx=5, pady=5,fill=BOTH)
 		self.ram_val = StringVar()
 		self.ram_val.set("Ram Used: "+str(self.ram_percent)+"%")
 		self.ram_label = Label(self.memory_frame1, textvariable = self.ram_val)
-		self.ram_label.pack(side = LEFT)
+		self.ram_label.pack(side = LEFT,fill=BOTH)
 
 		#Swap Used
 		self.swap_bar = Progressbar(self.memory_frame2, length=300, value = self.swap_percent, mode="determinate")
-		self.swap_bar.pack(padx=5, pady=5)
+		self.swap_bar.pack(padx=5, pady=5,fill=BOTH)
 		self.swap_val = StringVar()
 		self.swap_val.set("Swap Used: "+str(self.swap_percent)+"%")
 		self.swap_label = Label(self.memory_frame2, textvariable = self.swap_val)
-		self.swap_label.pack(side = LEFT)
+		self.swap_label.pack(side = LEFT,fill=BOTH)
 
 		#Disk Space Used
 		self.disk_bar = Progressbar(self.memory_frame3, length=300, value = self.disk_percent, mode="determinate")
-		self.disk_bar.pack(padx=5, pady=5)
+		self.disk_bar.pack(padx=5, pady=5,fill=BOTH)
 		self.disk_val = StringVar()
 		self.disk_val.set("Disk Used: "+str(self.disk_percent)+"%")
 		self.disk_label = Label(self.memory_frame3, textvariable = self.disk_val)
-		self.disk_label.pack(side = LEFT)
+		self.disk_label.pack(side = LEFT,fill=BOTH)
 
-		self.memory_frame1.pack()
-		self.memory_frame2.pack()
-		self.memory_frame3.pack()
-		self.memory_window.pack()	
+		self.memory_frame1.pack(fill=BOTH)
+		self.memory_frame2.pack(fill=BOTH)
+		self.memory_frame3.pack(fill=BOTH)
+		self.memory_window.pack(fill=BOTH)	
 
-#################################################### SENSORS ##############################################
+###################################################### SENSORS #####################################################
 		#Current Sensor Values
 		self.temperature = pc.sensors_temperatures()
 		self.battery = pc.sensors_battery()
@@ -137,29 +141,29 @@ class SystemMonitor():
 
 		#Progress Bar to show current temperature
 		self.temp_bar = Progressbar(self.sensor_frame1, length=300, value = self.temp_cur, mode="determinate", maximum = self.temp_critical)
-		self.temp_bar.pack(padx=5, pady=5)
+		self.temp_bar.pack(padx=5, pady=5,fill=BOTH)
 
 		#Temperature
 		self.cur_temp = StringVar()
 		self.cur_temp.set("cur_temp: "+str(self.temp_cur)+"`C")
 		self.cur_temp_label = Label(self.sensor_frame1, textvariable = self.cur_temp )
-		self.cur_temp_label.pack(side = LEFT)
+		self.cur_temp_label.pack(side = LEFT,fill=BOTH)
 		self.label_temp = Label(self.sensor_frame1, text = "critical_temp: "+str(self.temp_critical)+"\u2103" )
-		self.label_temp.pack(side = RIGHT)
+		self.label_temp.pack(side = RIGHT,fill=BOTH)
 
 		#Battery Status
 		self.batt_estimate = StringVar()
 		self.batt_estimate.set("Battery Estimate: "+str(self.battery_estimate))
 		self.batt_estimate_label = Label(self.sensor_frame2, textvariable = self.batt_estimate )
-		self.batt_estimate_label.pack()
+		self.batt_estimate_label.pack(fill=BOTH)
 		self.label_batt_type = Label(self.sensor_frame2, text = "Power Source: "+self.power_source )
-		self.label_batt_type.pack(side = LEFT)
+		self.label_batt_type.pack(side = LEFT,fill=BOTH)
 
-		self.sensor_frame1.pack()
-		self.sensor_frame2.pack(side = LEFT)
-		self.sensor_window.pack()
+		self.sensor_frame1.pack(fill=BOTH)
+		self.sensor_frame2.pack(side = LEFT,fill=BOTH)
+		self.sensor_window.pack(fill=BOTH)
 
-################################################### GRAPH ###############################################
+################################################### GRAPH ##########################################################
 		#Graph Variables
 		self.fig = Figure(figsize=(0.1,0.1))
 		ax = self.fig.add_subplot(111)
@@ -170,16 +174,52 @@ class SystemMonitor():
 		ax.set_xlabel("Time", fontsize=10)
 		self.canvas = FigureCanvasTkAgg(self.fig, master=self.f4)
 		self.canvas.show()
-		self.canvas.get_tk_widget().pack(side='top', fill='both', expand=1,ipadx=180)
+		self.canvas.get_tk_widget().pack(side='top', fill=BOTH, expand=1,ipadx=180)
+
+############################################### PROCESSES ##########################################################
+		self.kill_process_id = 0
+
+		self.scrollbar = Scrollbar(self.f5)
+		self.scrollbar.pack(side=RIGHT, fill=Y)
+
+		self.update_button = Button(self.f5, text="Update", command=self.update_processes)
+		self.update_button.pack(side=TOP)
+
+		tv = Treeview(self.f5)
+		tv['columns'] = ('cpu', 'id','status')
+		tv.heading("#0", text='Process Name', anchor='w')
+		tv.column("#0", anchor="w", width=75)
+		tv.heading('cpu', text='% CPU')
+		tv.column('cpu', anchor='center', width=40)
+		tv.heading('id', text='PID')
+		tv.column('id', anchor='center', width=35)
+		tv.heading('status', text='Status')
+		tv.column('status', anchor='center', width=40)
+		tv.pack(fill=BOTH)
+		self.treeview = tv
+
+		tv.tag_configure('active', background='green')
+		# attach listbox to scrollbar
+		self.treeview.config(yscrollcommand=self.scrollbar.set)
+		self.scrollbar.config(command=self.treeview.yview)
+
+		self.pMenu = Menu(self.f5, tearoff=0)
+		self.pMenu.add_command(label="Kill Process", command=self.kill_process)
+		self.pMenu.add_command(label="Kill Process Tree", command=self.kill_process_tree)
+		self.pMenu.add_command(label="Cancel")
+
+		self.treeview.bind("<Button-3>", self.process_popup)
+		self.treeview.bind("<Button-2>", self.process_popup)
 
 
-################################################### UPDATE ####################################################		
+################################################### UPDATE #########################################################		
 
 		#Call Update() after 100 ms
-		self.job1 = self.f1.after(100, self.update_cpu)
-		self.job2 = self.f2.after(100,self.update_memory)
-		self.job3 = self.f3.after(100,self.update_sensors)
-		self.job4 = self.f4.after(100,self.update_graph)
+		self.job1 = self.f1.after(1000, self.update_cpu)
+		self.job2 = self.f2.after(1000,self.update_memory)
+		self.job3 = self.f3.after(1000,self.update_sensors)
+		self.job4 = self.f4.after(1000,self.update_graph)
+		self.job5 = self.f5.after(1000,self.update_processes)
 		#The Main Loop
 		self.root.mainloop()
 		#Kill everything once the window is closed.
@@ -188,8 +228,11 @@ class SystemMonitor():
 		self.f2.after_cancel(self.job2)
 		self.f3.after_cancel(self.job3)
 		self.f4.after_cancel(self.job4)
+		self.f5.after_cancel(self.job5)
 		print ("Good Bye!")
 		sys.exit()
+
+################################################### UPDATE FUNCTIONS #########################################################
 
 	#The Update function to update the CPU Usage Values
 	def update_cpu(self):
@@ -255,6 +298,74 @@ class SystemMonitor():
 		self.line.set_xdata(np.arange(0,len(self.cpu_arr),1))
 		self.canvas.draw()
 		self.job4 = self.f4.after(500, self.update_graph)
+
+	def update_processes(self):
+		# print("Updating Processes")
+		all_items = self.treeview.get_children()
+		for item in all_items:
+			self.treeview.delete(item)
+		list = []
+		for p in pc.process_iter():
+			try:
+				list.append(p.as_dict(attrs=['pid','name','cpu_percent','status','ppid']))
+			except pc.NoSuchProcess:
+				pass
+		list = sorted(list,key=itemgetter('cpu_percent'), reverse=True)
+		for pinfo in list:
+			name = pinfo['name']
+			pid = pinfo['pid']
+			ppid = pinfo['ppid']
+			status = pinfo['status']
+			cpu = pinfo['cpu_percent']
+			if ppid>1:
+				if status == "running": 
+					self.treeview.insert('', 'end', text=name, values=(cpu,pid,status), tags=('active'))
+				else:
+					self.treeview.insert('', 'end', text=name, values=(cpu,pid,status))
+
+
+
+
+################################################# POPUPS #########################################################
+
+	#Processes Menu PopUp
+	def process_popup(self, event):
+		iid = self.treeview.identify_row(event.y)
+		if iid:
+			# mouse pointer over item
+			self.treeview.selection_set(iid)
+			# print(self.treeview.item(iid)['values'][1])
+			self.kill_process_id = self.treeview.item(iid)['values'][1]
+			self.pMenu.post(event.x_root, event.y_root)
+		else:
+			self.pMenu.unpost()
+
+	def kill_process(self):
+		if self.kill_process_id:
+			code = pc.Process(self.kill_process_id).kill()
+			print("process {} terminated with exit code {}".format(self.kill_process_id, code))
+			self.kill_process_id = 0
+			self.job5 = self.f5.after(100, self.update_processes)
+		else:
+			print ("Please Try Again.")
+
+	def kill_process_tree(self):
+		if self.kill_process_id:
+			procs = pc.Process(self.kill_process_id).children(recursive=True)
+			for p in procs:
+				p.terminate()
+			gone, still_alive = pc.wait_procs(procs, timeout=3, callback=on_terminate)
+			for p in still_alive:
+				p.kill()
+			code = pc.Process(self.kill_process_id).kill()
+			print("process {} terminated with exit code {}".format(self.kill_process_id, code))
+			self.kill_process_id = 0
+			self.job5 = self.f5.after(100, self.update_processes)
+		else:
+			print ("Please Try Again.")
+
+def on_terminate(proc):
+	print("process {} terminated with exit code {}".format(proc, proc.returncode))
 
 
 test = SystemMonitor()
