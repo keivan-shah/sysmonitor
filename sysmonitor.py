@@ -32,7 +32,7 @@ class SystemMonitor():
 		self.f5 = Frame(self.n)	  # Processes
 		self.n.add(self.f1, text='CPU Usage')
 		self.n.add(self.f2, text='Memory')
-		self.n.add(self.f3, text='CPU Temperature')
+		self.n.add(self.f3, text='Sensors')
 		self.n.add(self.f4, text='Graph')
 		self.n.add(self.f5, text='Processes')
 		self.n.pack(fill=BOTH)
