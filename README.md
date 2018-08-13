@@ -1,5 +1,5 @@
 # SYSMONITOR
-A mini project in python than acts a system monitor. This `python3` application makes use of the `Tkinter` package for the GUI and `psutil` Library to make the necessary function calls to get the underlying system details as required.  
+A mini project in python than acts as a system monitor. This `python3` application makes use of the `Tkinter` package for the GUI and `psutil` Library to make the necessary function calls to get the underlying system details as required.  
 _____________________________________________________________________________________________________________________________________
 
 # INSTALLATION:
